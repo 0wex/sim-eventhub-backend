@@ -15,12 +15,32 @@
       "bearerAuth": []
     }
   ],
+  "tags": [
+    {
+      "name": "Usuarios y Mi Agenda",
+      "description": "Registro (público) y gestión de Mi Agenda (protegido: Authorization: Bearer <token>; sin token devuelve 403)."
+    },
+    {
+      "name": "Categorías",
+      "description": "Categorías culturales de la agenda municipal (público)."
+    },
+    {
+      "name": "Eventos",
+      "description": "Búsqueda de eventos con filtros y detalle por ID (público)."
+    },
+    {
+      "name": "Autenticación",
+      "description": "Inicio de sesión. Devuelve un token JWT."
+    }
+  ],
   "paths": {
     "/users/register": {
       "post": {
         "tags": [
-          "user-controller"
+          "Usuarios y Mi Agenda"
         ],
+        "summary": "Registrar usuario",
+        "description": "Crea una cuenta nueva y devuelve un token JWT listo para usar. Endpoint público.",
         "operationId": "register",
         "requestBody": {
           "content": {
@@ -34,14 +54,21 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Usuario registrado",
             "content": {
               "*/*": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "string"
-                  }
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Correo ya registrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -52,8 +79,9 @@
     "/users/agenda": {
       "post": {
         "tags": [
-          "user-controller"
+          "Usuarios y Mi Agenda"
         ],
+        "summary": "Agregar evento a Mi Agenda",
         "operationId": "addAgenda",
         "requestBody": {
           "content": {
@@ -67,14 +95,25 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Agregado (sin cuerpo)"
+          },
+          "400": {
+            "description": "El evento no existe",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       },
       "delete": {
         "tags": [
-          "user-controller"
+          "Usuarios y Mi Agenda"
         ],
+        "summary": "Remover evento de Mi Agenda",
         "operationId": "removeAgenda",
         "requestBody": {
           "content": {
@@ -88,7 +127,7 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Removido (sin cuerpo)"
           }
         }
       }
@@ -96,8 +135,10 @@
     "/auth/login": {
       "post": {
         "tags": [
-          "auth-controller"
+          "Autenticación"
         ],
+        "summary": "Iniciar sesión",
+        "description": "Valida las credenciales y devuelve un token JWT.",
         "operationId": "login",
         "requestBody": {
           "content": {
@@ -111,14 +152,21 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Login exitoso",
             "content": {
               "*/*": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "string"
-                  }
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Credenciales inválidas",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -129,30 +177,40 @@
     "/events/{id}": {
       "get": {
         "tags": [
-          "event-controller"
+          "Eventos"
         ],
+        "summary": "Detalle de un evento",
         "operationId": "getById",
         "parameters": [
           {
             "name": "id",
             "in": "path",
+            "description": "ID del evento",
             "required": true,
             "schema": {
               "type": "integer",
               "format": "int64"
-            }
+            },
+            "example": 3
           }
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Evento encontrado",
             "content": {
               "*/*": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "object"
-                  }
+                  "$ref": "#/components/schemas/EventDetailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "El evento no existe",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -163,56 +221,63 @@
     "/events/search": {
       "get": {
         "tags": [
-          "event-controller"
+          "Eventos"
         ],
+        "summary": "Buscar eventos con filtros",
+        "description": "Todos los filtros son opcionales y combinables. Sin parámetros devuelve los 40 eventos.",
         "operationId": "search",
         "parameters": [
           {
             "name": "title",
             "in": "query",
+            "description": "Busca por título (contiene, sin distinguir mayúsculas)",
             "required": false,
             "schema": {
               "type": "string"
-            }
+            },
+            "example": "taller"
           },
           {
             "name": "categoryId",
             "in": "query",
+            "description": "Filtra por categoría",
             "required": false,
             "schema": {
               "type": "integer",
               "format": "int64"
-            }
+            },
+            "example": 1
           },
           {
             "name": "from",
             "in": "query",
+            "description": "Fecha mínima de realización, YYYY-MM-DD (inclusive)",
             "required": false,
             "schema": {
               "type": "string"
-            }
+            },
+            "example": "2026-08-10"
           },
           {
             "name": "to",
             "in": "query",
+            "description": "Fecha máxima de realización, YYYY-MM-DD (inclusive)",
             "required": false,
             "schema": {
               "type": "string"
-            }
+            },
+            "example": "2026-08-20"
           }
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Lista de eventos que cumplen los filtros",
             "content": {
               "*/*": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "object",
-                    "additionalProperties": {
-                      "type": "object"
-                    }
+                    "$ref": "#/components/schemas/EventResponse"
                   }
                 }
               }
@@ -224,21 +289,20 @@
     "/categories": {
       "get": {
         "tags": [
-          "category-controller"
+          "Categorías"
         ],
+        "summary": "Listar todas las categorías",
+        "description": "Devuelve las 8 categorías culturales precargadas.",
         "operationId": "getCategories",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Lista de categorías",
             "content": {
               "*/*": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "object",
-                    "additionalProperties": {
-                      "type": "object"
-                    }
+                    "$ref": "#/components/schemas/CategoryResponse"
                   }
                 }
               }
@@ -254,13 +318,39 @@
         "type": "object",
         "properties": {
           "email": {
-            "type": "string"
+            "type": "string",
+            "description": "Correo electrónico válido",
+            "example": "vecino@municipalidad.gob.pe"
           },
           "password": {
-            "type": "string"
+            "type": "string",
+            "description": "Contraseña del usuario",
+            "example": "miPassword123"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Nombre completo del usuario",
+            "example": "María García"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Mensaje de error legible",
+            "example": "Event not found"
+          }
+        }
+      },
+      "TokenResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Token JWT. Enviarlo en el header Authorization: Bearer <token>",
+            "example": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ2ZWNpbm9AbXVuaWNpcGFsaWRhZC5nb2IucGUifQ.abc123"
           }
         }
       },
@@ -269,7 +359,9 @@
         "properties": {
           "eventId": {
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "description": "ID del evento",
+            "example": 1
           }
         }
       },
@@ -277,10 +369,114 @@
         "type": "object",
         "properties": {
           "email": {
-            "type": "string"
+            "type": "string",
+            "description": "Correo registrado",
+            "example": "vecino@municipalidad.gob.pe"
           },
           "password": {
-            "type": "string"
+            "type": "string",
+            "description": "Contraseña del usuario",
+            "example": "miPassword123"
+          }
+        }
+      },
+      "EventDetailResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Identificador único del evento",
+            "example": 3
+          },
+          "title": {
+            "type": "string",
+            "description": "Título del evento",
+            "example": "Noche de Jazz y Bolero"
+          },
+          "date": {
+            "type": "string",
+            "description": "Fecha de realización (YYYY-MM-DD)",
+            "example": "2026-08-22"
+          },
+          "location": {
+            "type": "string",
+            "description": "Lugar donde se realiza",
+            "example": "Plaza de Armas"
+          },
+          "description": {
+            "type": "string",
+            "description": "Descripción del evento",
+            "example": "Velada al aire libre con ensambles de jazz y trío de boleros."
+          },
+          "categoryId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "ID de la categoría",
+            "example": 1
+          },
+          "categoryName": {
+            "type": "string",
+            "description": "Nombre de la categoría",
+            "example": "Música"
+          }
+        }
+      },
+      "EventResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Identificador único del evento",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "description": "Título del evento",
+            "example": "Concierto de la Orquesta Sinfónica Municipal"
+          },
+          "date": {
+            "type": "string",
+            "description": "Fecha de realización (YYYY-MM-DD)",
+            "example": "2026-08-08"
+          },
+          "location": {
+            "type": "string",
+            "description": "Lugar donde se realiza",
+            "example": "Teatro Municipal"
+          },
+          "categoryId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "ID de la categoría a la que pertenece",
+            "example": 1
+          }
+        }
+      },
+      "CategoryResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Identificador único de la categoría",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Nombre de la categoría",
+            "example": "Música"
+          },
+          "description": {
+            "type": "string",
+            "description": "Descripción de la categoría",
+            "example": "Conciertos y recitales en espacios públicos"
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "URL de la imagen de la categoría",
+            "example": "https://via.placeholder.com/300"
           }
         }
       }
