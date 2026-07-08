@@ -10,11 +10,6 @@
       "url": "http://localhost:8080"
     }
   ],
-  "security": [
-    {
-      "bearerAuth": []
-    }
-  ],
   "tags": [
     {
       "name": "Usuarios y Mi Agenda",
@@ -56,7 +51,7 @@
           "200": {
             "description": "Usuario registrado",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/TokenResponse"
                 }
@@ -66,9 +61,12 @@
           "400": {
             "description": "Correo ya registrado",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "Email already in use"
                 }
               }
             }
@@ -94,20 +92,31 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "Agregado (sin cuerpo)"
-          },
           "400": {
             "description": "El evento no existe",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "Event not found"
                 }
               }
             }
+          },
+          "403": {
+            "description": "Sin token o token inválido"
+          },
+          "200": {
+            "description": "Agregado (sin cuerpo)"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -126,10 +135,18 @@
           "required": true
         },
         "responses": {
+          "403": {
+            "description": "Sin token o token inválido"
+          },
           "200": {
             "description": "Removido (sin cuerpo)"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/auth/login": {
@@ -151,22 +168,25 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "Login exitoso",
+          "400": {
+            "description": "Credenciales inválidas",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TokenResponse"
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "Invalid credentials"
                 }
               }
             }
           },
-          "400": {
-            "description": "Credenciales inválidas",
+          "200": {
+            "description": "Login exitoso",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/TokenResponse"
                 }
               }
             }
@@ -195,22 +215,25 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Evento encontrado",
+          "400": {
+            "description": "El evento no existe",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EventDetailResponse"
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "Event not found"
                 }
               }
             }
           },
-          "400": {
-            "description": "El evento no existe",
+          "200": {
+            "description": "Evento encontrado",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/EventDetailResponse"
                 }
               }
             }
@@ -273,7 +296,7 @@
           "200": {
             "description": "Lista de eventos que cumplen los filtros",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
@@ -298,7 +321,7 @@
           "200": {
             "description": "Lista de categorías",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
@@ -339,8 +362,7 @@
         "properties": {
           "error": {
             "type": "string",
-            "description": "Mensaje de error legible",
-            "example": "Event not found"
+            "description": "Mensaje de error legible"
           }
         }
       },

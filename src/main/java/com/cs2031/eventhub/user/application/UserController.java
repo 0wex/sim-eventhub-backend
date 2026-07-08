@@ -5,8 +5,10 @@ import com.cs2031.eventhub.exception.ErrorResponse;
 import com.cs2031.eventhub.user.domain.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -48,7 +50,9 @@ public class UserController {
             description = "Crea una cuenta nueva y devuelve un token JWT listo para usar. Endpoint público.")
     @ApiResponse(responseCode = "200", description = "Usuario registrado")
     @ApiResponse(responseCode = "400", description = "Correo ya registrado",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(value = "{\"error\": \"Email already in use\"}")))
     @PostMapping("/register")
     public ResponseEntity<TokenResponse> register(@RequestBody RegisterRequest req) {
         String token = authService.register(req.email(), req.password(), req.name());
@@ -58,7 +62,11 @@ public class UserController {
     @Operation(summary = "Agregar evento a Mi Agenda")
     @ApiResponse(responseCode = "200", description = "Agregado (sin cuerpo)")
     @ApiResponse(responseCode = "400", description = "El evento no existe",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(value = "{\"error\": \"Event not found\"}")))
+    @SecurityRequirement(name = "bearerAuth")
+    @ApiResponse(responseCode = "403", description = "Sin token o token inválido", content = @Content)
     @PostMapping("/agenda")
     public ResponseEntity<Void> addAgenda(@AuthenticationPrincipal UserDetails user,
                                           @RequestBody AgendaRequest req) {
@@ -68,6 +76,8 @@ public class UserController {
 
     @Operation(summary = "Remover evento de Mi Agenda")
     @ApiResponse(responseCode = "200", description = "Removido (sin cuerpo)")
+    @SecurityRequirement(name = "bearerAuth")
+    @ApiResponse(responseCode = "403", description = "Sin token o token inválido", content = @Content)
     @DeleteMapping("/agenda")
     public ResponseEntity<Void> removeAgenda(@AuthenticationPrincipal UserDetails user,
                                              @RequestBody AgendaRequest req) {

@@ -6,6 +6,7 @@ import com.cs2031.eventhub.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -64,7 +65,9 @@ public class EventController {
     @Operation(summary = "Detalle de un evento")
     @ApiResponse(responseCode = "200", description = "Evento encontrado")
     @ApiResponse(responseCode = "400", description = "El evento no existe",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = ErrorResponse.class),
+                    examples = @ExampleObject(value = "{\"error\": \"Event not found\"}")))
     @GetMapping("/{id}")
     public ResponseEntity<EventDetailResponse> getById(
             @Parameter(description = "ID del evento", example = "3") @PathVariable Long id) {
