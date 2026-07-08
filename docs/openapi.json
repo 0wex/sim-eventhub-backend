@@ -92,6 +92,12 @@
           "required": true
         },
         "responses": {
+          "403": {
+            "description": "Sin token o token inválido"
+          },
+          "200": {
+            "description": "Agregado (sin cuerpo)"
+          },
           "400": {
             "description": "El evento no existe",
             "content": {
@@ -104,12 +110,6 @@
                 }
               }
             }
-          },
-          "403": {
-            "description": "Sin token o token inválido"
-          },
-          "200": {
-            "description": "Agregado (sin cuerpo)"
           }
         },
         "security": [
@@ -168,6 +168,16 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "description": "Login exitoso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
           "400": {
             "description": "Credenciales inválidas",
             "content": {
@@ -177,16 +187,6 @@
                 },
                 "example": {
                   "error": "Invalid credentials"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Login exitoso",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TokenResponse"
                 }
               }
             }
@@ -215,6 +215,16 @@
           }
         ],
         "responses": {
+          "200": {
+            "description": "Evento encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventDetailResponse"
+                }
+              }
+            }
+          },
           "400": {
             "description": "El evento no existe",
             "content": {
@@ -224,16 +234,6 @@
                 },
                 "example": {
                   "error": "Event not found"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Evento encontrado",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/EventDetailResponse"
                 }
               }
             }
@@ -498,7 +498,7 @@
           "imageUrl": {
             "type": "string",
             "description": "URL de la imagen de la categoría",
-            "example": "https://via.placeholder.com/300"
+            "example": "https://placehold.co/300"
           }
         }
       }

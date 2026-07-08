@@ -81,7 +81,7 @@ public class DataInitializer implements CommandLineRunner {
 
     private void seed(String name, String description, List<String[]> events) {
         Category category = categoryRepo.save(
-                new Category(name, description, "https://via.placeholder.com/300"));
+                new Category(name, description, "https://placehold.co/300"));
         events.forEach(e -> eventRepo.save(new Event(e[0], e[1], e[2], e[3], category)));
     }
 }
