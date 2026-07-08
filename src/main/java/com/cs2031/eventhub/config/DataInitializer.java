@@ -7,6 +7,8 @@ import com.cs2031.eventhub.event.infrastructure.EventRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Component
@@ -81,7 +83,11 @@ public class DataInitializer implements CommandLineRunner {
 
     private void seed(String name, String description, List<String[]> events) {
         Category category = categoryRepo.save(
-                new Category(name, description, "https://placehold.co/300"));
+                new Category(name, description, img(name)));
         events.forEach(e -> eventRepo.save(new Event(e[0], e[1], e[2], e[3], category)));
+    }
+
+    private static String img(String name) {
+        return "https://placehold.co/300?text=" + URLEncoder.encode("Imagen de " + name, StandardCharsets.UTF_8);
     }
 }

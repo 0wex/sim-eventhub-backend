@@ -25,7 +25,7 @@ public class CategoryController {
             @Schema(description = "Identificador único de la categoría", example = "1") Long id,
             @Schema(description = "Nombre de la categoría", example = "Música") String name,
             @Schema(description = "Descripción de la categoría", example = "Conciertos y recitales en espacios públicos") String description,
-            @Schema(description = "URL de la imagen de la categoría", example = "https://placehold.co/300") String imageUrl) {}
+            @Schema(description = "URL de la imagen de la categoría", example = "https://placehold.co/300?text=Imagen+de+M%C3%BAsica") String imageUrl) {}
 
     @Operation(summary = "Listar todas las categorías",
             description = "Devuelve las 8 categorías culturales precargadas.")

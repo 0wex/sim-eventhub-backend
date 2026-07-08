@@ -92,9 +92,6 @@
           "required": true
         },
         "responses": {
-          "403": {
-            "description": "Sin token o token inválido"
-          },
           "200": {
             "description": "Agregado (sin cuerpo)"
           },
@@ -110,6 +107,9 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Sin token o token inválido"
           }
         },
         "security": [
@@ -498,7 +498,7 @@
           "imageUrl": {
             "type": "string",
             "description": "URL de la imagen de la categoría",
-            "example": "https://placehold.co/300"
+            "example": "https://placehold.co/300?text=Imagen+de+M%C3%BAsica"
           }
         }
       }
